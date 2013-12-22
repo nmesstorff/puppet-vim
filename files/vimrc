@@ -1,0 +1,231 @@
+" .vimrc Norman Meßtorff <normes@normes.org>
+
+" This line should not be removed as it ensures that various options are
+" properly set to work with the Vim-related packages available in Debian.
+runtime! debian.vim
+
+source /etc/vim/pathogen/autoload/pathogen.vim
+
+" generic
+let mapleader=","           " set leaderkey to ','
+set nocompatible            " we need no compatible mode
+set title                   " set path & filename in modern terminals
+set modeline modelines=0    " disable modelines for security reasons
+set ruler		            " show the cursor position all the time
+set relativenumber          " display relative line numbers on the left
+set numberwidth=1           " use only 1 column while possible
+set background=light        " set terminal color to use nice colors
+set cursorline              " set permanent cursorline
+set wildmode=full           " set autocompletition in cmdl-mode zsh like
+set wildmenu                " show matches on autocompletition in cmdl-mode
+" ignore the folliwing files in wildmode
+set wildignore=*.o,*.obj,*.bak,*.exe,*.pyc,*.swp,*.git,*.svn
+set wildignore+=*.zip,*.rar,*.tar.gz,*.tar.bz2
+set wildignore+=*.swp
+set encoding=utf-8          " set default fileencoding
+set fileformat=unix         " default fileformat (unix,dos)
+set fileformats=unix,dos,mac    " define fileformat detection
+set scrolloff=4             " show at least n-lines when scrolling
+set sidescrolloff=5
+set laststatus=2
+
+" history
+set history=50	    " keep 50 lines of command line history
+set undolevels=50   " keep 50 undos in history
+
+" indent
+set pastetoggle=<F10>
+set backspace=indent,eol,start      " allow backspacing over everything in
+
+" insert mode
+set formatoptions=tcqn
+set expandtab     " use spaces insted of tabs
+set tabstop=4     " Number of spaces to use for tabstop
+set sts=4         "
+set shiftwidth=4  " Number of spaces to use for each step of (auto)indent.
+set shiftround    " round indent to multiple of shiftwidth
+set smarttab      " intelligentes löschen von leerzeichen-tabs
+set textwidth=80  "
+set colorcolumn=80 " Spalte einfärben
+set autoindent    " automatisches Einrücken
+set smartindent   " smart-indent erweitert autoindent
+set cindent       " cindent als alternative zu smartindent, sofern verfügbar
+
+" show
+set showmode    " If in Insert, Replace or Visual mode put a message on the
+                " last line
+set showcmd		" Show (partial) command in the last line of the screen
+set showmatch   " When a bracket is inserted, briefly jump to the matching one
+set showfulltag " show more information when completing tags
+set matchtime=2 " how many tenths of a second to blink matching brackets for
+
+" folding
+set foldenable  " enable folding
+set foldmethod=syntax " set foldmethod
+set foldlevelstart=99 " all fold open by default
+
+" search
+set incsearch   " show search matches as you type
+set ignorecase  " ignore case in search pattern
+set smartcase   " ignore case if search pattern is all lowercase,
+                " case-sensitive otherwise
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+" diff
+set diffopt+=iwhite
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+              \ | wincmd p | diffthis
+endif
+
+" maus
+" In many terminal emulators the mouse works just fine, thus enable it.
+"if has('mouse')
+"  set mouse=a
+"endif
+
+" spellchecker
+"setlocal spell spelllang=en
+
+" Omnicomplete
+set omnifunc=syntaxcomplete#Complete
+
+" NeoComplettition
+let g:acp_enableAtStartup = 0
+let g:neocomplcache_enable_at_startup = 1
+let g:neocomplcache_enable_smart_case = 1
+let g:neocomplcache_min_syntax_length = 3
+let g:neocomplcache_enable_underbar_completion = 1
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+  " Enable file type detection.
+  filetype plugin indent on
+
+  " Put these in an autocmd group, so that we can delete them easily.
+  augroup vimrcEx
+  au!
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid or when inside an event handler
+  " (happens when dropping a file on gvim).
+  " Also don't do it when the mark is in the first line, that is the default
+  " position when opening a file.
+  autocmd BufReadPost *
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \   exe "normal! g`\"" |
+    \ endif
+  augroup END
+endif " has("autocmd")
+
+" MacVim
+if has("gui_macvim")
+    macmenu &File.New\ Tab key=<nop>
+    map <D-t> :CommandT<CR>
+endif
+
+" Use clipboard of Mac OSX
+if has('mac')
+    set clipboard=unnamed
+end
+
+" variables
+let email_address = ""
+let fullname = ""
+let snips_author = ""
+let snips_email = ""
+let snips_github = ""
+let snippets_dir = "vim-snippets/snippets/"
+let g:airline_powerline_fonts = 1
+let g:GPGPreferSign=1
+let g:GPGUsePipes=1
+
+" Filetype detection
+au! BufRead,BufNewFile templates/*.template setfiletype eruby
+" Vagrant and Puppet
+autocmd BufRead,BufNewFile Vagrantfile set ft=ruby
+
+" 3th Party modules
+execute pathogen#infect('/etc/vim/bundle/{}')
+call pathogen#helptags()    " generate helptag documentation for any existing
+                            " bundles
+
+" set colorscheme
+if &t_Co >= 256 || has('gui_running')
+  colorscheme solarized
+  let g:solarized_contrast="high"
+endif
+highlight SignColumn ctermbg=7 guibg=Grey90
+highlight CursorLine cterm=underline ctermbg=15 guibg=Grey90
+highlight GitGutterAdd ctermbg=7 guibg=Grey90
+highlight GitGutterChange ctermbg=7 guibg=Grey90
+highlight GitGutterDelete ctermbg=7 guibg=Grey90
+highlight GitGutterChangeDelete ctermbg=7 guibg=Grey90
+
+
+" unmap F1 - stupid help key
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
+
+" Paste mode
+" nnoremap <C-E>  :silent! set invpaste<CR>
+" set pastetoggle=<C-E>
+
+" map for syntastic errors window
+nnoremap <LEADER>e :Errors<CR>
+" autoclose syntastic's error windown when no errors
+let g:syntastic_auto_loc_list=2
+" check syntax on file open
+let g:syntastic_check_on_open=0
+let g:syntastic_mode_map = { 'mode': 'active',
+                            \ 'active_filetypes':
+                            \   ['ruby', 'php', 'python', 'puppet', ],
+                            \ 'passive_filetypes': ['',] }
+
+" enable puppet module detection
+let g:puppet_module_detect=1
+
+" set supertab to do context based completion
+let g:SuperTabDefaultCompletionType = "context"
+
+" tell bufferline to not print each filename.
+let g:bufferline_echo=0
+
+" sourrounds maps
+nmap <Leader>{ ysiw{
+nmap <Leader>} ysiw}
+nmap <Leader>" ysiw"
+nmap <Leader>' ysiw'
+
+" map <Leader> key
+nnoremap <silent><leader><space> :noh<cr> " map <space> to disable highlighting
+
+nmap <Leader>T= :Tabularize /=<CR>
+vmap <Leader>T= :Tabularize /=<CR>
+nmap <Leader>T: :Tabularize /:\zs<CR>
+vmap <Leader>T: :Tabularize /:\zs<CR>
+
+nmap <Leader>nt :NERDTree<CR>
+vmap <Leader>nt :NERDTree<CR>
+" reformats entire file based on current indent/syntax settings, then resets
+" cursor to last position
+noremap <silent><leader>k gg=G``
+
+" Enable/Disable Neocomplettition
+nmap <Leader>o :NeoComplCacheEnable<CR>
+nmap <Leader>O :NeoComplCacheDisable<CR>
+
+" Source a local configuration file if available
+if filereadable("~/.vimrc")
+  source ~/.vimrc
+endif
+
